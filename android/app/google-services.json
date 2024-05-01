@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "842753310658",
+    "project_id": "mastering-firebase-25daa",
+    "storage_bucket": "mastering-firebase-25daa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:842753310658:android:04c3555307a4b6e983e05b",
+        "android_client_info": {
+          "package_name": "com.example.mastering_firebase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMJdgbN1qy1iZd9JwN6mRfjjfXNjU1soQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
