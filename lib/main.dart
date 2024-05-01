@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:mastering_firebase/HomeScreen/HomeScreen.dart';
 import 'package:mastering_firebase/auth/Login/LoginScreen.dart';
 import 'package:mastering_firebase/firebase_options.dart';
 
@@ -18,12 +20,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const LoginScreen(),
+      home: FirebaseAuth.instance.currentUser == null ? const LoginScreen() : const HomeScreen(),
     );
   }
 }

@@ -1,4 +1,7 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mastering_firebase/HomeScreen/HomeScreen.dart';
 
 import '../components/App_icon.dart';
 import '../components/TextFormField.dart';
@@ -14,11 +17,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmePasswordController = TextEditingController();
+  final emailReg = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+
   @override
   void dispose() {
-    // TODO: implement dispose
     _emailController.dispose();
     _passwordController.dispose();
+    _usernameController.dispose();
+    _confirmePasswordController.dispose();
     super.dispose();
   }
 
@@ -59,9 +66,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 DefaultTextField(
                   text: 'Enter your Name',
-                  controller: _emailController,
+                  controller: _usernameController,
                   validator: (value) {
-                    if (value != null) {
+                    if (value!.isNotEmpty) {
                       return null;
                     } else {
                       return "Please enter your Name";
@@ -79,7 +86,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   text: 'Enter your email',
                   controller: _emailController,
                   validator: (value) {
-                    if (value != null) {
+                    if (value!.isNotEmpty || emailReg.hasMatch(value!)) {
                       return null;
                     } else {
                       return "Please enter your email";
@@ -97,7 +104,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   text: "Enter your password",
                   controller: _passwordController,
                   validator: (value) {
-                    if (value != null) {
+                    if (value!.isNotEmpty) {
                       return null;
                     } else {
                       return "Please enter your password";
@@ -113,9 +120,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 DefaultTextField(
                   text: "Re-enter your password",
-                  controller: _passwordController,
+                  controller: _confirmePasswordController,
                   validator: (value) {
-                    if (value != null) {
+                    if (value!.isNotEmpty || value == _passwordController.text) {
                       return null;
                     } else {
                       return "Please enter your password";
@@ -132,7 +139,43 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.amber,
                     ),
-                    onPressed: () {},
+                    onPressed: () async {
+                      try {
+                        await FirebaseAuth.instance
+                            .createUserWithEmailAndPassword(
+                          email: _emailController.text,
+                          password: _passwordController.text,
+                        );
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const HomeScreen()));
+                      } on FirebaseAuthException catch (e) {
+                        if (e.code == 'weak-password') {
+                          AwesomeDialog(
+                            context: context,
+                            dialogType: DialogType.error,
+                            animType: AnimType.rightSlide,
+                            title: 'Error',
+                            desc: 'The password provided is too weak.',
+                            btnCancelOnPress: () {},
+                            btnOkOnPress: () {},
+                          ).show();
+                        } else if (e.code == 'email-already-in-use') {
+                          AwesomeDialog(
+                            context: context,
+                            dialogType: DialogType.error,
+                            animType: AnimType.rightSlide,
+                            title: 'Error',
+                            desc: 'The account already exists for that email.',
+                            btnCancelOnPress: () {},
+                            btnOkOnPress: () {},
+                          ).show();
+                        }
+                      } catch (e) {
+                        print(e);
+                      }
+                    },
                     child: const Text(
                       "Register",
                       style: TextStyle(
