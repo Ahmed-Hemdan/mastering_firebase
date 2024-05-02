@@ -20,10 +20,10 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   final emailReg = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+  var auth = FirebaseAuth.instance;
 
   @override
   void dispose() {
-    // TODO: implement dispose
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -71,7 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     text: 'Enter your email',
                     controller: _emailController,
                     validator: (value) {
-                      if (value!.isNotEmpty || emailReg.hasMatch(value!)) {
+                      if (value!.isNotEmpty || emailReg.hasMatch(value)) {
                         return null;
                       } else {
                         return "Please enter your email";
@@ -120,16 +120,27 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
                           try {
-                            await FirebaseAuth.instance
-                                .signInWithEmailAndPassword(
+                            await auth.signInWithEmailAndPassword(
                               email: _emailController.text,
                               password: _passwordController.text,
                             );
-                            Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => const HomeScreen()),
-                                (route) => false);
+
+                            if (auth.currentUser!.emailVerified && auth.currentUser!.emailVerified != null) {
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => const HomeScreen()),
+                                  (route) => false);
+                            } else {
+                              AwesomeDialog(
+                                context: context,
+                                dialogType: DialogType.info,
+                                animType: AnimType.rightSlide,
+                                title: 'Email verify',
+                                desc:
+                                    'Please check your email for email verification and login',
+                              ).show();
+                            }
                           } on FirebaseAuthException catch (e) {
                             if (e.code == 'invalid-credential') {
                               AwesomeDialog(
@@ -153,7 +164,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               ).show();
                             }
                           }
-                        }else{null;}
+                        } else {
+                          null;
+                        }
                       },
                       child: const Text(
                         "Login",
