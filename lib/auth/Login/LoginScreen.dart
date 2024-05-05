@@ -25,7 +25,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -128,6 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
                           try {
+                            
                             await auth.signInWithEmailAndPassword(
                               email: _emailController.text,
                               password: _passwordController.text,

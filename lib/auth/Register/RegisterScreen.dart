@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mastering_firebase/auth/Login/LoginScreen.dart';
 
+
 import '../components/App_icon.dart';
 import '../components/TextFormField.dart';
 
@@ -17,7 +18,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmePasswordController = TextEditingController();
+  final TextEditingController _confirmePasswordController =
+      TextEditingController();
   final emailReg = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
   var auth = FirebaseAuth.instance;
 
@@ -88,7 +90,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   text: 'Enter your email',
                   controller: _emailController,
                   validator: (value) {
-                    if (value!.isNotEmpty && emailReg.hasMatch(value!)) {
+                    if (value!.isNotEmpty && emailReg.hasMatch(value)) {
                       return null;
                     } else {
                       return "Please enter your email";
@@ -125,10 +127,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   controller: _confirmePasswordController,
                   validator: (value) {
                     if (value!.isNotEmpty && value == _passwordController.text) {
+                    if (value!.isNotEmpty ||
+                        value == _passwordController.text) {
                       return null;
                     } else {
                       return "Please enter your password";
                     }
+                  }
                   },
                 ),
                 const SizedBox(
@@ -143,8 +148,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     onPressed: () async {
                       try {
-                        await auth
-                            .createUserWithEmailAndPassword(
+                        
+                        await auth.createUserWithEmailAndPassword(
                           email: _emailController.text,
                           password: _passwordController.text,
                         );
@@ -159,6 +164,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               Navigator.push(context, MaterialPageRoute(builder: (context)=> const LoginScreen() )) ;
                             },
                           ).show();
+                        await auth.currentUser!.sendEmailVerification().then(
+                              (value) => AwesomeDialog(
+                                context: context,
+                                dialogType: DialogType.info,
+                                animType: AnimType.rightSlide,
+                                title: 'Email verify',
+                                btnOkOnPress: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const LoginScreen())),
+                                desc:
+                                    'Please check your email for email verification and login',
+                              ).show(),
+                            );
                       } on FirebaseAuthException catch (e) {
                         if (e.code == 'weak-password') {
                           AwesomeDialog(
@@ -167,8 +187,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             animType: AnimType.rightSlide,
                             title: 'Error',
                             desc: 'The password provided is too weak.',
-                            btnCancelOnPress: () {},
-                            btnOkOnPress: () {},
                           ).show();
                         } else if (e.code == 'email-already-in-use') {
                           AwesomeDialog(
@@ -177,12 +195,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             animType: AnimType.rightSlide,
                             title: 'Error',
                             desc: 'The account already exists for that email.',
-                            btnCancelOnPress: () {},
-                            btnOkOnPress: () {},
                           ).show();
-                        }
+                        } else {}
                       } catch (e) {
-                        print(e);
+                        print(e.toString());
                       }
                     },
                     child: const Text(
