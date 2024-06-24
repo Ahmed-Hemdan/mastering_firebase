@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class DefaultTextField extends StatelessWidget {
-  final String text;
+  final String hintText;
   final TextEditingController controller;
   final String? Function(String?)? validator;
   const DefaultTextField({
     super.key,
-    required this.text,
+    required this.hintText,
     required this.controller,
     required this.validator,
     required,
@@ -22,7 +22,7 @@ class DefaultTextField extends StatelessWidget {
             const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
         filled: true,
         fillColor: Colors.grey[200],
-        hintText: text,
+        hintText: hintText,
         hintStyle: const TextStyle(color: Colors.grey, fontSize: 15),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),

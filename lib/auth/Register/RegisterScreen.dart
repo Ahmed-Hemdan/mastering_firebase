@@ -69,7 +69,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 DefaultTextField(
-                  text: 'Enter your Name',
+                  hintText: 'Enter your Name',
                   controller: _usernameController,
                   validator: (value) {
                     if (value!.isNotEmpty) {
@@ -87,7 +87,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 DefaultTextField(
-                  text: 'Enter your email',
+                  hintText: 'Enter your email',
                   controller: _emailController,
                   validator: (value) {
                     if (value!.isNotEmpty && emailReg.hasMatch(value)) {
@@ -105,7 +105,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 DefaultTextField(
-                  text: "Enter your password",
+                  hintText: "Enter your password",
                   controller: _passwordController,
                   validator: (value) {
                     if (value!.isNotEmpty) {
@@ -123,7 +123,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 DefaultTextField(
-                  text: "Re-enter your password",
+                  hintText: "Re-enter your password",
                   controller: _confirmePasswordController,
                   validator: (value) {
                     if (value!.isNotEmpty && value == _passwordController.text) {

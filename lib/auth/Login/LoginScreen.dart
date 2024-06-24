@@ -21,6 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   final emailReg = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+  bool isLoading = false;
   var auth = FirebaseAuth.instance;
 
   @override
@@ -69,7 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   DefaultTextField(
-                    text: 'Enter your email',
+                    hintText: 'Enter your email',
                     controller: _emailController,
                     validator: (value) {
                       if (value!.isNotEmpty && emailReg.hasMatch(value)) {
@@ -88,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   DefaultTextField(
-                    text: "Enter your password",
+                    hintText: "Enter your password",
                     controller: _passwordController,
                     validator: (value) {
                       if (value!.isNotEmpty) {
@@ -120,70 +121,84 @@ class _LoginScreenState extends State<LoginScreen> {
                   SizedBox(
                     width: double.infinity,
                     height: 60,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.amber,
-                      ),
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          try {
-                            
-                            await auth.signInWithEmailAndPassword(
-                              email: _emailController.text,
-                              password: _passwordController.text,
-                            );
-                            if (auth.currentUser!.emailVerified) {
-                              Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => const HomeScreen()),
-                                  (route) => false);
-                            } else {
-                              await auth.currentUser!.sendEmailVerification();
-                              AwesomeDialog(
-                                context: context,
-                                dialogType: DialogType.info,
-                                animType: AnimType.rightSlide,
-                                title: 'Email verify',
-                                desc:
-                                    'Please check your email to verify and continue using the app',
-                              ).show();
-                            }
-                          } on FirebaseAuthException catch (e) {
-                            if (e.code == 'invalid-credential') {
-                              AwesomeDialog(
-                                context: context,
-                                dialogType: DialogType.error,
-                                animType: AnimType.rightSlide,
-                                title: 'Error',
-                                desc: 'invalid credential',
-                                btnCancelOnPress: () {},
-                                btnOkOnPress: () {},
-                              ).show();
-                            } else {
-                              AwesomeDialog(
-                                context: context,
-                                dialogType: DialogType.error,
-                                animType: AnimType.rightSlide,
-                                title: 'Error',
-                                desc: 'There is somthing wronge',
-                                btnCancelOnPress: () {},
-                                btnOkOnPress: () {},
-                              ).show();
-                            }
-                          }
-                        } else {
-                          null;
-                        }
-                      },
-                      child: const Text(
-                        "Login",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                        ),
-                      ),
-                    ),
+                    child: isLoading == true
+                        ? const Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.amber,
+                            ),
+                            onPressed: () async {
+                              if (_formKey.currentState!.validate()) {
+                                try {
+                                  isLoading = true;
+                                  setState(() {});
+                                  await auth.signInWithEmailAndPassword(
+                                    email: _emailController.text,
+                                    password: _passwordController.text,
+                                  );
+                                  isLoading = false;
+                                  setState(() {});
+                                  if (auth.currentUser!.emailVerified) {
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (_) => HomeScreen()),
+                                        (route) => false);
+                                  } else {
+                                    await auth.currentUser!
+                                        .sendEmailVerification();
+                                    AwesomeDialog(
+                                      context: context,
+                                      dialogType: DialogType.info,
+                                      animType: AnimType.rightSlide,
+                                      title: 'Email verify',
+                                      desc:
+                                          'Please check your email to verify and continue using the app',
+                                    ).show();
+                                  }
+                                } on FirebaseAuthException catch (e) {
+                                  if (e.code == 'invalid-credential') {
+                                    AwesomeDialog(
+                                      context: context,
+                                      dialogType: DialogType.error,
+                                      animType: AnimType.rightSlide,
+                                      title: 'Error',
+                                      desc: 'invalid credential',
+                                      btnCancelOnPress: () {},
+                                      btnOkOnPress: () {},
+                                    ).show();
+                                    isLoading = false;
+                                    setState(() {});
+                                  } else {
+                                    AwesomeDialog(
+                                      context: context,
+                                      dialogType: DialogType.error,
+                                      animType: AnimType.rightSlide,
+                                      title: 'Error',
+                                      desc: 'There is somthing wronge',
+                                      btnCancelOnPress: () {},
+                                      btnOkOnPress: () {},
+                                    ).show();
+                                    isLoading = false;
+                                    setState(() {});
+                                  }
+                                }
+                              } else {
+                                isLoading = false;
+                                setState(() {});
+                                
+                              }
+                            },
+                            child: const Text(
+                              "Login",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                              ),
+                            ),
+                          ),
                   ),
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 35.0),

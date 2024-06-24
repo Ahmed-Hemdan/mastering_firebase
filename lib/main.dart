@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:mastering_firebase/HomeScreen/HomeScreen.dart';
+import 'package:mastering_firebase/HomeScreen/HomeComponents/components.dart';
 import 'package:mastering_firebase/auth/Login/LoginScreen.dart';
 import 'package:mastering_firebase/firebase_options.dart';
 
@@ -23,10 +24,30 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.grey[50],
+          titleTextStyle: const TextStyle(
+            fontSize: 25,
+            fontWeight: FontWeight.bold,
+            color: Colors.amber,
+          ),
+          iconTheme: const IconThemeData(
+            color: Colors.amber,
+          ),
+          actionsIconTheme: const IconThemeData(
+            color: Colors.amber,
+          ),
+        ),
+        floatingActionButtonTheme: const FloatingActionButtonThemeData(
+          backgroundColor: Colors.amber,
+        ),
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: FirebaseAuth.instance.currentUser == null ? const LoginScreen() : const HomeScreen(),
+      home: FirebaseAuth.instance.currentUser == null
+          ? const LoginScreen()
+          : const HomeScreen(),
     );
   }
 }
+ //FirebaseAuth.instance.currentUser == null ? const LoginScreen() : const HomeScreen(),

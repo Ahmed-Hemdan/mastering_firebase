@@ -25,7 +25,6 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
           style: TextStyle(fontSize: 25),
         ),
         centerTitle: true,
-        backgroundColor: Colors.amber,
       ),
       body: Center(
         child: Padding(
@@ -47,7 +46,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                   ),
                 ),
                 DefaultTextField(
-                  text: 'Enter your email',
+                  hintText: 'Enter your email',
                   controller: _emailController,
                   validator: (value) {
                     if (value!.isNotEmpty && emailReg.hasMatch(value)) {
