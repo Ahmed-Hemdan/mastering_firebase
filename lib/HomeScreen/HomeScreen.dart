@@ -1,8 +1,11 @@
+import 'dart:collection';
+
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:mastering_firebase/CategoryNotes/CategoryNotes.dart';
 import 'package:mastering_firebase/HomeScreen/HomeComponents/components.dart';
 import 'package:mastering_firebase/auth/Login/LoginScreen.dart';
 import 'package:mastering_firebase/auth/components/TextFormField.dart';
@@ -32,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
           "Category_name": _catigoryName.text,
         });
         Navigator.pop(context);
+        _catigoryName.clear();
         getData();
       }
     } catch (e) {
@@ -194,23 +198,109 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               itemCount: data.length,
               itemBuilder: (context, index) => InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CategoryNotes(
+                          userId: userId,
+                          categoryId: data[index].id,
+                        ),
+                      ),
+                    );
+                  },
                   onLongPress: () {
+                    _catigoryName.text = data[index]['Category_name'];
                     AwesomeDialog(
                       context: context,
                       dialogType: DialogType.warning,
                       animType: AnimType.rightSlide,
-                      title: 'Delete Category',
-                      desc: 'Are you sure you wanna delete this category ??',
-                      btnCancelOnPress: () {},
-                      btnOkOnPress: () async {
-                        await FirebaseFirestore.instance
-                            .collection("Users")
-                            .doc(userId)
-                            .collection("Categories")
-                            .doc(data[index].id)
-                            .delete();
-                        getData();
-                      },
+                      title: 'Delete & Edit ',
+                      desc: 'Edit or Delete category',
+                      btnCancel: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                        ),
+                        onPressed: () {
+                          AwesomeDialog(
+                            context: context,
+                            dialogType: DialogType.warning,
+                            animType: AnimType.rightSlide,
+                            btnCancelOnPress: () {
+                              _catigoryName.clear();
+                            },
+                            body: Form(
+                              key: _formkey,
+                              child: Column(
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text(
+                                      "Edit Category",
+                                      style: TextStyle(fontSize: 18),
+                                    ),
+                                  ),
+                                  DefaultTextField(
+                                    controller: _catigoryName,
+                                    hintText: 'Category name',
+                                    validator: (value) {
+                                      if (value!.isNotEmpty) {
+                                        return null;
+                                      } else {
+                                        return "Category name can't be empty ";
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            btnOkOnPress: () async {
+                              if (_formkey.currentState!.validate()) {
+                                await FirebaseFirestore.instance
+                                    .collection("Users")
+                                    .doc(userId)
+                                    .collection("Categories")
+                                    .doc(data[index].id)
+                                    .update(
+                                        {"Category_name": _catigoryName.text});
+                                getData();
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const HomeScreen(),
+                                  ),
+                                  (route) => false,
+                                );
+                              }
+                            },
+                          ).show();
+                        },
+                        child: const Text(
+                          "Edit",
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      btnOk: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red),
+                          onPressed: () async {
+                            await FirebaseFirestore.instance
+                                .collection("Users")
+                                .doc(userId)
+                                .collection("Categories")
+                                .doc(data[index].id)
+                                .delete();
+                            getData();
+                            Navigator.pop(context);
+                          },
+                          child: const Text(
+                            "Delete",
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                          )),
                     ).show();
                   },
                   child:

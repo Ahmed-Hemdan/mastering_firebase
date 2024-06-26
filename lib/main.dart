@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:mastering_firebase/CategoryNotes/CategoryNotes.dart';
 import 'package:mastering_firebase/HomeScreen/HomeScreen.dart';
 import 'package:mastering_firebase/HomeScreen/HomeComponents/components.dart';
 import 'package:mastering_firebase/auth/Login/LoginScreen.dart';
@@ -39,8 +40,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         floatingActionButtonTheme: const FloatingActionButtonThemeData(
-          backgroundColor: Colors.amber,
-        ),
+            backgroundColor: Colors.amber, shape: OvalBorder()),
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
