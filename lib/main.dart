@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mastering_firebase/CategoryNotes/CategoryNotes.dart';
 import 'package:mastering_firebase/HomeScreen/HomeScreen.dart';
 import 'package:mastering_firebase/HomeScreen/HomeComponents/components.dart';
+import 'package:mastering_firebase/IamTrying/transaction.dart';
 import 'package:mastering_firebase/auth/Login/LoginScreen.dart';
 import 'package:mastering_firebase/firebase_options.dart';
 
@@ -44,9 +45,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: FirebaseAuth.instance.currentUser == null
-          ? const LoginScreen()
-          : const HomeScreen(),
+      home: const TransactionScreen(),
     );
   }
 }
