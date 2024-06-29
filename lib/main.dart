@@ -1,11 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:mastering_firebase/CategoryNotes/CategoryNotes.dart';
-import 'package:mastering_firebase/HomeScreen/HomeScreen.dart';
-import 'package:mastering_firebase/HomeScreen/HomeComponents/components.dart';
-import 'package:mastering_firebase/IamTrying/transaction.dart';
-import 'package:mastering_firebase/auth/Login/LoginScreen.dart';
+
+import 'package:mastering_firebase/IamTrying/SinglePatch.dart';
+
 import 'package:mastering_firebase/firebase_options.dart';
 
 void main() async {
@@ -45,7 +42,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const TransactionScreen(),
+      home: const SinglePatchScreen(),
     );
   }
 }

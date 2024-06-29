@@ -10,7 +10,6 @@ class TransactionScreen extends StatefulWidget {
 
 class _TransactionScreenState extends State<TransactionScreen> {
   Future<List<DocumentSnapshot>> getData() async {
-    print("GEtDAta=================================");
     QuerySnapshot response =
         await FirebaseFirestore.instance.collection("Users").get();
     return response.docs;
@@ -47,22 +46,20 @@ class _TransactionScreenState extends State<TransactionScreen> {
                     DocumentReference docref = FirebaseFirestore.instance
                         .collection("Users")
                         .doc(data[index].id);
-                    await FirebaseFirestore.instance
-                        .runTransaction((transaction) async {
-                      DocumentSnapshot snapshot = await transaction.get(docref);
-                      if (snapshot.exists) {
-                        var snapshotData = snapshot.data();
-                        if (snapshotData is Map<String, dynamic>) {
-                          print("==========================================");
-                          int money = snapshotData["money"] + 100;
-                          transaction.update(docref, {"money": money});
-                          setState(
-                              () {}); // Refresh the UI after the transaction
-                          print(
-                              "++++++++++++++++++++++++++++++++++++++++++++++");
+                    await FirebaseFirestore.instance.runTransaction(
+                      (transaction) async {
+                        DocumentSnapshot snapshot =
+                            await transaction.get(docref);
+                        if (snapshot.exists) {
+                          var snapshotData = snapshot.data();
+                          if (snapshotData is Map<String, dynamic>) {
+                            int money = snapshotData["money"] + 100;
+                            transaction.update(docref, {"money": money});
+                            setState(() {});
+                          }
                         }
-                      }
-                    });
+                      },
+                    );
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
