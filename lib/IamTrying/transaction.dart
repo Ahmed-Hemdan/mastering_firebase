@@ -9,11 +9,10 @@ class TransactionScreen extends StatefulWidget {
 }
 
 class _TransactionScreenState extends State<TransactionScreen> {
-  Future<List<DocumentSnapshot>> getData() async {
-    QuerySnapshot response =
-        await FirebaseFirestore.instance.collection("Users").get();
-    return response.docs;
-  }
+  Stream<QuerySnapshot> userStream =
+      FirebaseFirestore.instance.collection('Users').snapshots();
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -21,31 +20,20 @@ class _TransactionScreenState extends State<TransactionScreen> {
       appBar: AppBar(
         title: const Text("Transaction"),
       ),
-      body: FutureBuilder<List<DocumentSnapshot>>(
-        future: getData(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator.adaptive(),
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text("Error: ${snapshot.error}"),
-            );
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text("No data available"),
-            );
-          } else {
-            List<DocumentSnapshot> data = snapshot.data!;
-            return ListView.builder(
-              itemCount: data.length,
-              itemBuilder: (context, index) {
-                return InkWell(
+      body: StreamBuilder<QuerySnapshot>(stream: userStream, builder: (context , snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting){
+          return const Center(child: CircularProgressIndicator.adaptive(),);
+        }else if (snapshot.hasError){
+          return const Center(child: Text("There is error while getting data"),);
+        }else {
+          return ListView.builder(
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (context, index){
+              return InkWell(
                   onTap: () async {
                     DocumentReference docref = FirebaseFirestore.instance
                         .collection("Users")
-                        .doc(data[index].id);
+                        .doc(snapshot.data!.docs[index].id);
                     await FirebaseFirestore.instance.runTransaction(
                       (transaction) async {
                         DocumentSnapshot snapshot =
@@ -74,11 +62,11 @@ class _TransactionScreenState extends State<TransactionScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             Text(
-                              data[index]['name'],
+                              snapshot.data!.docs[index]['name'],
                               style: const TextStyle(fontSize: 25),
                             ),
                             Text(
-                              "${data[index]['money']}\$",
+                              "${snapshot.data!.docs[index]['money']}\$",
                               style: const TextStyle(
                                   color: Colors.red, fontSize: 25),
                             ),
@@ -88,11 +76,12 @@ class _TransactionScreenState extends State<TransactionScreen> {
                     ),
                   ),
                 );
-              },
-            );
-          }
-        },
-      ),
+            }, );
+        }
+      },) , 
     );
   }
 }
+
+
+
