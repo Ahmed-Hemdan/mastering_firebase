@@ -302,6 +302,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           )),
                     ).show();
+                    _catigoryName.clear() ;
                   },
                   child:
                       HomeComponents(folderName: data[index]["Category_name"])),

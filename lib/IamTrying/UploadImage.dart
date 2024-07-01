@@ -20,7 +20,7 @@ class _UploadImageScreenState extends State<UploadImageScreen> {
       final XFile? image = await picker.pickImage(source: ImageSource.camera);
       if (image != null) {
         file = File(image.path);
-        String imageName = basename(image!.path);
+        String imageName = basename(image.path);
         var storageRef = FirebaseStorage.instance.ref(imageName);
         await storageRef.putFile(file!);
           url = await storageRef.getDownloadURL();

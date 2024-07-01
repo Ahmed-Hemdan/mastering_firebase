@@ -126,14 +126,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   hintText: "Re-enter your password",
                   controller: _confirmePasswordController,
                   validator: (value) {
-                    if (value!.isNotEmpty && value == _passwordController.text) {
-                    if (value!.isNotEmpty ||
-                        value == _passwordController.text) {
-                      return null;
-                    } else {
+                    if (value!.isEmpty) {
                       return "Please enter your password";
+                  } else {
+                      return null;
                     }
-                  }
+                    
                   },
                 ),
                 const SizedBox(

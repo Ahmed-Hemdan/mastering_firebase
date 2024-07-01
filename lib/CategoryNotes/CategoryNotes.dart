@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mastering_firebase/EditNote/EditNote.dart';
 
 class CategoryNotes extends StatefulWidget {
@@ -21,6 +25,31 @@ class _CategoryNotesState extends State<CategoryNotes> {
   List<QueryDocumentSnapshot> data = [];
   String catName = '';
   bool isLoading = true;
+  String? url;
+  uploadImage() async {
+    try {
+      File? file;
+      var picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: ImageSource.camera);
+      if (image != null) {
+        file = File(image.path);
+        String imageName = image.path.split("/").last;
+        var storage = FirebaseStorage.instance.ref("Images").child(imageName);
+        await storage.putFile(file);
+        url = await storage.getDownloadURL();
+        setState(() {});
+      }
+    } catch (e) {
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.error,
+        animType: AnimType.rightSlide,
+        title: 'Error',
+        desc: 'Somthing happend while adding photo',
+      ).show();
+    }
+  }
+
   addNote() async {
     try {
       if (_formkey.currentState!.validate()) {
@@ -32,7 +61,7 @@ class _CategoryNotesState extends State<CategoryNotes> {
               widget.categoryId,
             )
             .collection("Notes")
-            .add({"note": _noteController.text});
+            .add({"note": _noteController.text, "image": url ?? "none"});
         getData();
       }
     } catch (e) {
@@ -90,6 +119,9 @@ class _CategoryNotesState extends State<CategoryNotes> {
           .collection('Notes')
           .doc(data[index].id)
           .delete();
+      if (data[index]['image'] != "none") {
+        await FirebaseStorage.instance.refFromURL(url!).delete();
+      }
       getData();
     } catch (e) {
       AwesomeDialog(
@@ -106,11 +138,12 @@ class _CategoryNotesState extends State<CategoryNotes> {
     super.initState();
   }
 
-    @override
+  @override
   void dispose() {
     _noteController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -155,22 +188,38 @@ class _CategoryNotesState extends State<CategoryNotes> {
             ),
             body: Form(
               key: _formkey,
-              child: TextFormField(
-                maxLines: 10,
-                controller: _noteController,
-                validator: (value) {
-                  if (value!.isNotEmpty) {
-                    return null;
-                  } else {
-                    return "note can't be empty";
-                  }
-                },
-                decoration: InputDecoration(
-                  hintText: "Add your note",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+              child: Column(
+                children: [
+                  TextFormField(
+                    maxLines: 8,
+                    controller: _noteController,
+                    validator: (value) {
+                      if (value!.isNotEmpty) {
+                        return null;
+                      } else {
+                        return "note can't be empty";
+                      }
+                    },
+                    decoration: InputDecoration(
+                      hintText: "Add your note",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
                   ),
-                ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      await uploadImage();
+                      setState(() {});
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                        url != null ? Colors.green : Colors.amber,
+                      ),
+                    ),
+                    child: const Icon(Icons.add_photo_alternate),
+                  ),
+                ],
               ),
             ),
           ).show();
@@ -209,6 +258,7 @@ class _CategoryNotesState extends State<CategoryNotes> {
                               flex: 1,
                               onPressed: (context) {
                                 deleteData(index);
+                                setState(() {});
                               },
                               backgroundColor: Colors.red,
                               foregroundColor: Colors.white,
@@ -238,7 +288,7 @@ class _CategoryNotesState extends State<CategoryNotes> {
                         ),
                         child: Container(
                           width: double.infinity,
-                          height: MediaQuery.of(context).size.height / 11,
+                          height: MediaQuery.of(context).size.height / 3,
                           decoration: BoxDecoration(
                             color: const Color.fromARGB(255, 218, 215, 215),
                             borderRadius: BorderRadius.circular(5),
@@ -247,14 +297,24 @@ class _CategoryNotesState extends State<CategoryNotes> {
                             padding: const EdgeInsets.symmetric(
                               horizontal: 15.0,
                             ),
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                data[index]["note"],
-                                style: const TextStyle(
-                                  fontSize: 17,
+                            child: Column(
+                              children: [
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    data[index]["note"],
+                                    style: const TextStyle(
+                                      fontSize: 17,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                data[index]['image'] != 'none'
+                                    ? Image.network(
+                                        data[index]["image"],
+                                        height: 40,
+                                      )
+                                    : Container(),
+                              ],
                             ),
                           ),
                         ),
