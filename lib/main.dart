@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:mastering_firebase/AccessToken/AccessToken.dart';
 import 'package:mastering_firebase/HomeScreen/HomeScreen.dart';
@@ -15,6 +16,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   NotificationHandel().initNotification();
+   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   AccessToken token = AccessToken() ;
   token.getAccessToken();
   
@@ -56,3 +58,11 @@ class MyApp extends StatelessWidget {
   }
 }
  //FirebaseAuth.instance.currentUser == null ? const LoginScreen() : const HomeScreen(),
+
+ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
+  await Firebase.initializeApp();
+
+  print("Handling a background message: ${message.messageId}");
+}
