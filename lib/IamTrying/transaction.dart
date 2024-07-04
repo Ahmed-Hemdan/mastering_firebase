@@ -13,7 +13,6 @@ class _TransactionScreenState extends State<TransactionScreen> {
       FirebaseFirestore.instance.collection('Users').snapshots();
 
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

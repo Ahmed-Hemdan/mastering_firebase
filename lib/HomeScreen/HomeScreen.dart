@@ -1,12 +1,13 @@
-import 'dart:collection';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mastering_firebase/CategoryNotes/CategoryNotes.dart';
 import 'package:mastering_firebase/HomeScreen/HomeComponents/components.dart';
+import 'package:mastering_firebase/IamTrying/SendMessage.dart';
 import 'package:mastering_firebase/auth/Login/LoginScreen.dart';
 import 'package:mastering_firebase/auth/components/TextFormField.dart';
 
@@ -24,6 +25,10 @@ class _HomeScreenState extends State<HomeScreen> {
   List data = [];
   bool isLoading = true;
   final String userId = FirebaseAuth.instance.currentUser!.uid;
+  FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+
+
+
   addCategory() async {
     try {
       if (_formkey.currentState!.validate()) {
@@ -98,6 +103,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         actions: [
+
+          IconButton(onPressed: (){
+            Navigator.push(context, MaterialPageRoute(builder: (context)=> const SendMessageScreen()))  ;
+          }, icon: const Icon(Icons.notification_add)),
           IconButton(
             onPressed: () async {
               GoogleSignIn googleSignIn = GoogleSignIn();

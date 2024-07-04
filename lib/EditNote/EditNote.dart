@@ -2,7 +2,6 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mastering_firebase/CategoryNotes/CategoryNotes.dart';
-import 'package:mastering_firebase/auth/components/TextFormField.dart';
 
 class EditNote extends StatefulWidget {
   final String userId;
@@ -60,7 +59,7 @@ class _EditNoteState extends State<EditNote> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Edit Note"),
+        title: const Text("Edit Note"),
       ),
       body: Center(
         child: Padding(
